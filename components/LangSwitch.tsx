@@ -2,26 +2,23 @@
 import { ChevronDown } from 'lucide-react'
 import { Button } from './ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu'
-import { atom, useAtom } from 'jotai'
 import { usePathname, useRouter } from '@/i18n/navigation'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
-const Lang = atom<string>('en')
 export default function LangSwitch() {
   const t = useTranslations('Dashboard')
-  const [lang, setLang] = useAtom(Lang)
   const pathname = usePathname()
   const router = useRouter()
+  const locale = useLocale()
   const handleChangeLang = (lang: string) => {
     router.replace(pathname, { locale: lang })
-    setLang(lang)
   }
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant='ghost'>
-          {lang === 'en' ? (
+          {locale === 'en' ? (
             <img src='/united kingdom.svg' alt='united kingdom' />
           ) : (
             <img src='/hong kong.svg' alt='hong kong' />
