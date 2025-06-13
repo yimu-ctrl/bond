@@ -32,5 +32,26 @@
     "Protocol Overview": "协议指标",
     "Coming Soon": "即将到来",
     "English": "中文"
+  },
+  "BurnBond": {
+    "Burn Bond Overview": "燃烧债券概览",
+    "Total Invested": "总投资额",
+    "Burned": "已燃烧",
+    "Investors": "投资者",
+    "Type": "类型",
+    "ROI": "回报率",
+    "Limit": "单次限额",
+    "Remaining": "剩余可投金额",
+    "Classic": "经典燃烧",
+    "Turbo": "涡轮增压",
+    "Invest": "投资",
+    "Your Investment": "你的投资",
+    "Expected Returns": "预期收益",
+    "Total Received": "已获收益",
+    "Your Bonus": "你的收益",
+    "*Available to Withdraw": "可提取金额",
+    "Withdraw": "提取",
+    "Your BOND": "你的BOND",
+    "Unlock": "未解锁"
   }
 }

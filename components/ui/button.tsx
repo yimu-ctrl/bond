@@ -17,7 +17,8 @@ const buttonVariants = cva(
         secondary: 'bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80',
         ghost: 'hover:bg-black hover:text-accent-foreground cursor-pointer dark:hover:bg-accent/50',
         link: 'text-primary underline-offset-4 hover:underline',
-        myStyle: 'bg-[#0CAEE4] font-[Poppins] sm:text-2xl cursor-pointer hover:bg-[#34A5B3]'
+        myStyle: 'bg-[#0CAEE4] font-[Poppins] sm:text-2xl cursor-pointer hover:bg-[#34A5B3]',
+        myStyleInvest: 'bg-[#0CAEE4] font-[Poppins] lg:text-2xl hover:bg-[#34A5B3] cursor-pointer'
       },
       size: {
         default: 'h-9 px-4 py-2 has-[>svg]:px-3',
@@ -25,7 +26,8 @@ const buttonVariants = cva(
         lg: 'h-10 rounded-md px-6 has-[>svg]:px-4',
         icon: 'size-9',
         mySizeLg: 'h-10 sm:h-12 sm:w-50 rounded-3xl px-6 has-[>svg]:px-4',
-        mySizeSm: 'h-10 sm:h-12 sm:w-30 md:w-25 lg:w-30 rounded-3xl px-6 has-[>svg]:px-4 '
+        mySizeSm: 'h-10 sm:h-12 sm:w-30 md:w-25 lg:w-30 rounded-3xl px-6 has-[>svg]:px-4 ',
+        mySizeInvest: 'h-6 sm:h-8 lg:h-10 rounded-3xl px-3 has-[>svg]:px-2.5'
       }
     },
     defaultVariants: {

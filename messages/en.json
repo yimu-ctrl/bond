@@ -32,5 +32,26 @@
     "Protocol Overview": "Protocol Overview",
     "Coming Soon": "Coming Soon",
     "English": "English"
+  },
+  "BurnBond": {
+    "Burn Bond Overview": "Burn Bond Overview",
+    "Total Invested": "Total Invested",
+    "Burned": "Burned",
+    "Investors": "Investors",
+    "Type": "Type",
+    "ROI": "ROI",
+    "Limit": "Limit",
+    "Remaining": "Remaining",
+    "Classic": "Classic",
+    "Turbo": "Turbo",
+    "Invest": "Invest",
+    "Your Investment": "Your Investment",
+    "Expected Returns": "Expected Returns",
+    "Total Received": "Total Received",
+    "Your Bonus": "Your Bonus",
+    "*Available to Withdraw": "*Available to Withdraw",
+    "Withdraw": "Withdraw",
+    "Your BOND": "Your BOND",
+    "Unlock": "Unlock"
   }
 }

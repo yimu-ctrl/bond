@@ -23,7 +23,7 @@ export function AppSidebar() {
     },
     {
       title: t('Burn Bond'),
-      url: '#',
+      url: '/BurnBond',
       icon: <img src='/burn.svg' alt='Burn Bond' />
     },
     {
@@ -78,7 +78,7 @@ export function AppSidebar() {
             <SidebarMenu>
               {items.map(item => (
                 <SidebarMenuItem className='pb-4' key={item.title}>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton asChild isActive>
                     <Link href={item.url}>
                       {item.icon}
                       <span className='text-sm font-[Poppins] text-[#F9FAFB] hover:text-[#0CAEE4]'>{item.title}</span>
