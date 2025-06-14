@@ -10,62 +10,64 @@ import {
   SidebarSeparator
 } from '@/components/ui/sidebar'
 import { useTranslations } from 'next-intl'
+import Image from 'next/image'
 import Link from 'next/link'
+import { FC } from 'react'
 
-export function AppSidebar() {
+const AppSidebar: FC = () => {
   const t = useTranslations('Sidebar')
 
   const items = [
     {
       title: t('Dashboard'),
       url: '/',
-      icon: <img src='/dashboard.svg' alt='Dashboard' />
+      icon: <Image width={14} height={14} src='/dashboard.svg' alt='Dashboard' />
     },
     {
       title: t('Burn Bond'),
-      url: '/BurnBond',
-      icon: <img src='/burn.svg' alt='Burn Bond' />
+      url: '/burn',
+      icon: <Image width={14} height={14} src='/burn.svg' alt='Burn Bond' />
     },
     {
       title: t('Stake Bond'),
       url: '#',
-      icon: <img src='/stake.svg' alt='Stake Bond' />
+      icon: <Image width={14} height={14} src='/stake.svg' alt='Stake Bond' />
     },
     {
       title: t('NFT Raffle'),
       url: '#',
-      icon: <img src='/NFT_Raffle.svg' alt='NFT Raffle' />
+      icon: <Image width={14} height={14} src='/nftRaffle.svg' alt='NFT Raffle' />
     },
     {
       title: t('Swap'),
       url: '#',
-      icon: <img src='/swap.svg' alt='Swap' />
+      icon: <Image width={14} height={14} src='/swap.svg' alt='Swap' />
     }
   ]
   const itemsBelow = [
     {
       title: t('Community'),
       url: '/',
-      icon: <img src='/Community.svg' alt='Community' />
+      icon: <Image width={14} height={14} src='/community.svg' alt='Community' />
     },
     {
       title: t('Whitepaper'),
       url: '#',
-      icon: <img src='/Whitepaper.svg' alt='Whitepaper' />
+      icon: <Image width={14} height={14} src='/whitepaper.svg' alt='Whitepaper' />
     },
     {
       title: t('Twitter'),
       url: '#',
-      icon: <img src='/x-twitter.svg' alt='Twitter' />
+      icon: <Image width={14} height={14} src='/twitter.svg' alt='Twitter' />
     }
   ]
   return (
-    <Sidebar>
+    <Sidebar className='w-[14rem] lg:w-[16rem]'>
       <SidebarHeader className='pl-5 pt-7 text-[#FFFFFF]'>
         <SidebarMenu>
           <SidebarMenuItem className='pb-3'>
             <Link href='/'>
-              <img src='./logob 2.svg' alt='logo' />
+              <Image className='h-auto max-w-[150px]' width={150} height={40} src='./logob2.svg' alt='logo' />
             </Link>
           </SidebarMenuItem>
           <SidebarMenuItem className='text-xs pb-2'>BOND Price: $0.01USD</SidebarMenuItem>
@@ -110,3 +112,7 @@ export function AppSidebar() {
     </Sidebar>
   )
 }
+
+AppSidebar.displayName = 'AppSidebar'
+
+export default AppSidebar

@@ -13,7 +13,7 @@ import { hasLocale, NextIntlClientProvider } from 'next-intl'
 import { routing } from '@/i18n/routing'
 import { notFound } from 'next/navigation'
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
-import { AppSidebar } from '@/components/app-sidebar'
+import AppSidebar from '@/components/AppSidebar'
 
 export const metadata: Metadata = {
   title: 'AppKit Example App',

@@ -4,6 +4,7 @@ import { Button } from './ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu'
 import { usePathname, useRouter } from '@/i18n/navigation'
 import { useLocale, useTranslations } from 'next-intl'
+import Image from 'next/image'
 
 export default function LangSwitch() {
   const t = useTranslations('Dashboard')
@@ -19,9 +20,9 @@ export default function LangSwitch() {
       <DropdownMenuTrigger asChild>
         <Button variant='ghost'>
           {locale === 'en' ? (
-            <img src='/united kingdom.svg' alt='united kingdom' />
+            <Image width={30} height={30} src='/unitedKingdom.svg' alt='united kingdom' />
           ) : (
-            <img src='/hong kong.svg' alt='hong kong' />
+            <Image width={30} height={30} src='/hongKong.svg' alt='hong kong' />
           )}
           <p className='text-xl text-[#F9FAFB]'>{t('English')}</p>
           <ChevronDown />
@@ -29,11 +30,11 @@ export default function LangSwitch() {
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem onClick={() => handleChangeLang('en')}>
-          <img src='/united kingdom.svg' alt='hong kong' />
+          <Image width={30} height={30} src='/unitedKingdom.svg' alt='hong kong' />
           <p className='text-xl text-[#000000]'>English</p>
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => handleChangeLang('zh')}>
-          <img src='/hong kong.svg' alt='kingdom' />
+          <Image width={30} height={30} src='/hongKong.svg' alt='kingdom' />
           <p className='text-xl text-[#000000]'>中文</p>
         </DropdownMenuItem>
       </DropdownMenuContent>
