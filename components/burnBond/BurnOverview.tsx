@@ -22,7 +22,7 @@ const BurnOverview: FC = () => {
     { title: 'Investors', value: 10000000 }
   ]
   return (
-    <div>
+    <>
       <h2 className='font-[Poppins] text-[#FFFFFF] text-xl sm:text-2xl lg:text-3xl text-center'>
         {t('Burn Bond Overview')}
       </h2>
@@ -31,7 +31,7 @@ const BurnOverview: FC = () => {
           return renderOverviewCard(item)
         })}
       </div>
-    </div>
+    </>
   )
 }
 
