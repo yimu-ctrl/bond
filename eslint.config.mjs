@@ -9,13 +9,14 @@ const compat = new FlatCompat({
   baseDirectory: __dirname
 })
 
-const eslintConfig = [
+export default [
   ...compat.extends('next/core-web-vitals', 'next/typescript'),
+
   {
     rules: {
-      '@next/next/no-img-element': 'error' 
+      '@next/next/no-img-element': 'error',
+
+      'no-console': ['warn']
     }
   }
 ]
-
-export default eslintConfig

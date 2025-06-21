@@ -34,7 +34,7 @@ const MintCardContent: FC = () => {
       <div className='flex flex-col justify-center w-full text-center mt-5 flex-grow sm:w-1/4'>
         <div>
           <Button className='bg-[#0CAEE4] font-[Poppins] sm:text-2xl cursor-pointer hover:bg-[#34A5B3] h-10 sm:h-12 sm:w-30 md:w-25 lg:w-30 rounded-3xl px-6 has-[>svg]:px-4'>
-            <div className='font-[Poppins] text-xl'>Collect</div>
+            <div className='font-[Poppins] text-xl'>{t('Collect')}</div>
           </Button>
         </div>
       </div>

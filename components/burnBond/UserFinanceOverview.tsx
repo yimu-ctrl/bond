@@ -1,6 +1,5 @@
 import { FC } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
-import { Button } from '../ui/button'
 import { useTranslations } from 'next-intl'
 import { Props } from '@/types'
 import UserWithdrawCard from './UserWithdrawCard'
