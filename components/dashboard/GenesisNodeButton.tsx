@@ -1,8 +1,8 @@
 'use client'
 import { useTranslations } from 'next-intl'
 import { Button } from '../ui/button'
-import { FC, useEffect, useMemo, useState } from 'react'
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog'
+import { FC, useEffect, useState } from 'react'
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog'
 import { Label } from '../ui/Label'
 import { Input } from '../ui/input'
 import {
@@ -19,7 +19,10 @@ import { ETHType } from '@/types'
 
 const GenesisNodeButton: FC = () => {
   const [open, setOpen] = useState(false)
-
+  const [txHash, setTxHash] = useState<`0x${string}`>()
+  const { isLoading, isSuccess } = useWaitForTransactionReceipt({
+    hash: txHash
+  })
   const t = useTranslations('Dashboard')
   const { address, isConnected } = useAccount()
   const { connect } = useConnect()
@@ -37,7 +40,7 @@ const GenesisNodeButton: FC = () => {
     setOpen(true)
   }
 
-  let resultReferrer = useReadContract({
+  const resultReferrer = useReadContract({
     address: consts.TESTNET.REFERRAL_SYSTEM,
     abi: abiReferralSystem,
     functionName: 'getReferrer',
@@ -65,13 +68,15 @@ const GenesisNodeButton: FC = () => {
       functionName: 'purchaseTokens',
       args: [referrerAddress]
     })
-    const { isSuccess } = await useWaitForTransactionReceipt({ hash: tx })
-    if (isSuccess) {
-      alert('Success')
-    } else {
-      alert('Fail')
-    }
+    setTxHash(tx)
   }
+  useEffect(() => {
+    if (isSuccess) {
+      alert('Transaction succeeded!')
+    } else if (!isLoading && txHash) {
+      alert('Transaction failed!')
+    }
+  }, [isSuccess, isLoading, txHash])
   return (
     <div className='flex justify-center mt-5 sm:mt-10 md:mt-5 lg:mt-10 pb-5 sm:pb-10 md:pb-5 lg:pb-10'>
       <Button

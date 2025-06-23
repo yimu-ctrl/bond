@@ -1,16 +1,7 @@
 'use client'
-import { FC, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '../ui/Label'
 import { useTranslations } from 'next-intl'
@@ -21,13 +12,16 @@ import { ETHType } from '@/types'
 
 const InvestButton: FC<{ type: string }> = ({ type }) => {
   const t = useTranslations('StakeBond')
+  const [txHash, setTxHash] = useState<`0x${string}`>()
+  const { isLoading, isSuccess } = useWaitForTransactionReceipt({
+    hash: txHash
+  })
   const { isConnected } = useAccount()
   const { connect } = useConnect()
   const { writeContractAsync } = useWriteContract()
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-
-    const formData = new FormData(e.target)
+    const formData = new FormData(e.currentTarget)
     const amount = Number(formData.get('amount'))
     const referrer = formData.get('referrer')?.toString() || ''
     if (!isConnected) {
@@ -42,7 +36,7 @@ const InvestButton: FC<{ type: string }> = ({ type }) => {
             functionName: 'stakeUSDT',
             args: [BigInt(amount), referrer as ETHType]
           })
-          useWaitForTransactionReceipt({ hash: tx })
+          setTxHash(tx)
         } else {
           const tx = await writeContractAsync({
             address: consts.TESTNET.STAKING_CONTRACT,
@@ -50,15 +44,22 @@ const InvestButton: FC<{ type: string }> = ({ type }) => {
             functionName: 'stakeBOND',
             args: [BigInt(amount), referrer as ETHType]
           })
-          useWaitForTransactionReceipt({ hash: tx })
+          setTxHash(tx)
         }
       }
-    } catch (error: any) {
-      if (error.message.includes('User rejected the request')) {
+    } catch (error: unknown) {
+      if (error instanceof Error && error.message.includes('User rejected the request')) {
         alert('The user cancelled the transaction, please try again')
       }
     }
   }
+  useEffect(() => {
+    if (isSuccess) {
+      alert('Transaction succeeded!')
+    } else if (!isLoading && txHash) {
+      alert('Transaction failed!')
+    }
+  }, [isSuccess, isLoading, txHash])
   return (
     <Dialog>
       <DialogTrigger asChild>

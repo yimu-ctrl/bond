@@ -1,8 +1,8 @@
 'use client'
-import { FC } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { Button } from '../ui/button'
 import { useTranslations } from 'next-intl'
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import {
   injected,
   useAccount,
@@ -17,6 +17,10 @@ import { formatUnits } from 'viem'
 
 const BurnInvestTable: FC = () => {
   const t = useTranslations('BurnBond')
+  const [txHash, setTxHash] = useState<`0x${string}`>()
+  const { isLoading, isSuccess } = useWaitForTransactionReceipt({
+    hash: txHash
+  })
   const { isConnected } = useAccount()
   const { connect } = useConnect()
   const { writeContractAsync } = useWriteContract()
@@ -31,18 +35,20 @@ const BurnInvestTable: FC = () => {
         functionName: 'normalBurn',
         args: []
       })
-      const txReceipt = await useWaitForTransactionReceipt({ hash: tx })
-      if (txReceipt.isSuccess) {
-        alert('Transaction succeeded!')
-      } else {
-        alert('Transaction failed!')
-      }
-    } catch (error: any) {
-      if (error.message.includes('User rejected the request')) {
+      setTxHash(tx)
+    } catch (error: unknown) {
+      if (error instanceof Error && error.message.includes('User rejected the request')) {
         alert('The user cancelled the transaction, please try again')
       }
     }
   }
+  useEffect(() => {
+    if (isSuccess) {
+      alert('Transaction succeeded!')
+    } else if (!isLoading && txHash) {
+      alert('Transaction failed!')
+    }
+  }, [isSuccess, isLoading, txHash])
   const handleClickTurbo = async () => {
     if (!isConnected) {
       connect({ connector: injected() })
@@ -54,14 +60,9 @@ const BurnInvestTable: FC = () => {
         functionName: 'turboBurn',
         args: []
       })
-      const txReceipt = await useWaitForTransactionReceipt({ hash: tx })
-      if (txReceipt.isSuccess) {
-        alert('Transaction succeeded!')
-      } else {
-        alert('Transaction failed!')
-      }
-    } catch (error: any) {
-      if (error.message.includes('User rejected the request')) {
+      setTxHash(tx)
+    } catch (error: unknown) {
+      if (error instanceof Error && error.message.includes('User rejected the request')) {
         alert('The user cancelled the transaction, please try again')
       }
     }

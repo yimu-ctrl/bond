@@ -3,7 +3,6 @@ import BurnInvestTable from '@/components/burnBond/BurnInvestTable'
 import BurnOverview from '@/components/burnBond/BurnOverview'
 import UserFinanceOverview from '@/components/burnBond/UserFinanceOverview'
 import Header from '@/components/Header'
-import { useTranslations } from 'next-intl'
 
 export default function BurnBond() {
   return (

@@ -1,6 +1,6 @@
 'use client'
 import { FC } from 'react'
-import { ETHType, Props } from '@/types'
+import { ETHType } from '@/types'
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card'
 import { useTranslations } from 'next-intl'
 import { useAccount, useBalance, useReadContract } from 'wagmi'

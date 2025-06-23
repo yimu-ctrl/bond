@@ -3,7 +3,7 @@ import { FC } from 'react'
 import { useTranslations } from 'next-intl'
 import { TableHeader, TableRow, TableHead, TableBody, TableCell, Table } from '../ui/table'
 import InvestButton from './InvestButton'
-import { useReadContract, useReadContracts } from 'wagmi'
+import { useReadContracts } from 'wagmi'
 import { consts } from '@/types/constants'
 import { abiStakingContract } from '@/types/abi'
 import { formatUnits } from 'viem'
@@ -45,9 +45,6 @@ const StakeInvestTable: FC = () => {
       }
     ]
   })
-
-  const test = results.data ? results.data[0].result : 'isLoading'
-  console.log('test', test)
 
   const data = [
     { title: 'Type', value1: '90Days(USDT)', value2: '90Days(BOND)' },

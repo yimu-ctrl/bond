@@ -1,5 +1,5 @@
 'use client'
-import { FC } from 'react'
+import { FC, useEffect, useState } from 'react'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,6 +28,10 @@ import { abiStakingContract } from '@/types/abi'
 
 const WithdrawCapitalButton: FC = () => {
   const t = useTranslations('StakeBond')
+  const [txHash, setTxHash] = useState<`0x${string}`>()
+  const { isLoading, isSuccess } = useWaitForTransactionReceipt({
+    hash: txHash
+  })
   const { address, isConnected } = useAccount()
   const { connect } = useConnect()
   const { writeContractAsync } = useWriteContract()
@@ -51,21 +55,22 @@ const WithdrawCapitalButton: FC = () => {
             functionName: 'withdrawStake',
             args: [BigInt(i)]
           })
-          const txReceipt = useWaitForTransactionReceipt({ hash: tx })
-          if (txReceipt.isSuccess) {
-            alert('success')
-          }
+          setTxHash(tx)
         }
       }
-    } catch (error: any) {
-      if (error.message.includes('User rejected the request')) {
+    } catch (error: unknown) {
+      if (error instanceof Error && error.message.includes('User rejected the request')) {
         alert('The user cancelled the transaction, please try again')
-      } else {
-        console.error(` Failed to receive:`, error)
-        alert(`Failed to collect, please check the console log`)
       }
     }
   }
+  useEffect(() => {
+    if (isSuccess) {
+      alert('Transaction succeeded!')
+    } else if (!isLoading && txHash) {
+      alert('Transaction failed!')
+    }
+  }, [isSuccess, isLoading, txHash])
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>

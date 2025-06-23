@@ -3,14 +3,7 @@ import { FC } from 'react'
 import { Button } from '../ui/button'
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card'
 import { useTranslations } from 'next-intl'
-import {
-  injected,
-  useAccount,
-  useConnect,
-  useReadContract,
-  useWaitForTransactionReceipt,
-  useWriteContract
-} from 'wagmi'
+import { injected, useAccount, useConnect, useReadContract, useWriteContract } from 'wagmi'
 import { consts } from '@/types/constants'
 import { abiBurnContract } from '@/types/abi'
 import { formatUnits } from 'viem'
@@ -41,24 +34,17 @@ const UserWithdrawCard: FC = () => {
     try {
       if (isConnected && address) {
         for (let i = 0; i <= Number(userInvestmentCount.data); i++) {
-          const tx = await writeContractAsync({
+          await writeContractAsync({
             address: consts.TESTNET.BURN_CONTRACT,
             abi: abiBurnContract,
             functionName: 'claimReward',
             args: [BigInt(i)]
           })
-          const txReceipt = useWaitForTransactionReceipt({ hash: tx })
-          if (txReceipt.isSuccess) {
-            alert('success')
-          }
         }
       }
-    } catch (error: any) {
-      if (error.message.includes('User rejected the request')) {
+    } catch (error: unknown) {
+      if (error instanceof Error && error.message.includes('User rejected the request')) {
         alert('The user cancelled the transaction, please try again')
-      } else {
-        console.error(` Failed to receive:`, error)
-        alert(`Failed to collect, please check the console log`)
       }
     }
   }

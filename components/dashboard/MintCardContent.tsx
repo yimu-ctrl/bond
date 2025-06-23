@@ -2,7 +2,6 @@ import { FC } from 'react'
 import { CardContent } from '../ui/card'
 import { Button } from '../ui/button'
 import { useTranslations } from 'next-intl'
-import { Props } from '@/types'
 
 const MintCardContent: FC = () => {
   const t = useTranslations('Dashboard')

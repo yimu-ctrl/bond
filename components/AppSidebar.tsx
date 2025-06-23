@@ -20,10 +20,9 @@ import { FC } from 'react'
 const AppSidebar: FC = () => {
   const t = useTranslations('Sidebar')
   const pathname = usePathname()
-  console.log(pathname)
 
   const locale = useLocale()
-  console.log(pathname.startsWith(`/${locale}/burn`))
+
   const items = [
     {
       title: t('Dashboard'),

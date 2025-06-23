@@ -9,21 +9,14 @@ import { formatUnits } from 'viem'
 
 const WinningRecordsCard: FC = () => {
   const t = useTranslations('NFTRaffle')
-  const { isConnected, address } = useAccount()
+  const { address } = useAccount()
   const userClaimHistory = useReadContract({
     address: consts.TESTNET.LOTTERY,
     abi: abiLottery,
     functionName: 'getUserClaimHistory',
     args: address ? [address] : undefined
   })
-  const userClaimCount = useReadContract({
-    address: consts.TESTNET.LOTTERY,
-    abi: abiLottery,
-    functionName: 'getUserClaimCount',
-    args: address ? [address] : undefined
-  })
-  const count = userClaimCount.data ? Number(userClaimCount.data) : 0
-  function formatTimestamp(timestamp: any) {
+  function formatTimestamp(timestamp: bigint) {
     const date = new Date(Number(timestamp) * 1000)
     const year = date.getFullYear()
     const month = String(date.getMonth() + 1).padStart(2, '0')

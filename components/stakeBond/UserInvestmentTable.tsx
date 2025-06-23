@@ -1,5 +1,5 @@
 'use client'
-import { FC } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { TableCaption, TableHeader, TableRow, TableHead, TableBody, TableCell, Table, TableFooter } from '../ui/table'
 import { useTranslations } from 'next-intl'
 import { Button } from '../ui/button'
@@ -18,6 +18,10 @@ import { formatUnits } from 'viem'
 
 const UserInvestmentTable: FC = () => {
   const t = useTranslations('StakeBond')
+  const [txHash, setTxHash] = useState<`0x${string}`>()
+  const { isLoading, isSuccess } = useWaitForTransactionReceipt({
+    hash: txHash
+  })
   const { address, isConnected } = useAccount()
   const { connect } = useConnect()
   const { writeContractAsync } = useWriteContract()
@@ -40,18 +44,22 @@ const UserInvestmentTable: FC = () => {
             functionName: 'claimReward',
             args: [BigInt(i)]
           })
-          const txReceipt = useWaitForTransactionReceipt({ hash: tx })
-          if (txReceipt.isSuccess) {
-            alert('success')
-          }
+          setTxHash(tx)
         }
       }
-    } catch (error: any) {
-      if (error.message.includes('User rejected the request')) {
+    } catch (error: unknown) {
+      if (error instanceof Error && error.message.includes('User rejected the request')) {
         alert('The user cancelled the transaction, please try again')
       }
     }
   }
+  useEffect(() => {
+    if (isSuccess) {
+      alert('Transaction succeeded!')
+    } else if (!isLoading && txHash) {
+      alert('Transaction failed!')
+    }
+  }, [isSuccess, isLoading, txHash])
   const UserSummary = useReadContract({
     address: consts.TESTNET.STAKING_CONTRACT,
     abi: abiStakingContract,

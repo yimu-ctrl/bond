@@ -1,5 +1,5 @@
 'use client'
-import { FC } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../ui/card'
 import ReferralRewardsContent from '../stakeBond/ReferralRewardsContent'
 import { useTranslations } from 'next-intl'
@@ -20,6 +20,10 @@ import { formatUnits } from 'viem'
 
 const NFTInfoCards: FC = () => {
   const t = useTranslations('NFTRaffle')
+  const [txHash, setTxHash] = useState<`0x${string}`>()
+  const { isLoading, isSuccess } = useWaitForTransactionReceipt({
+    hash: txHash
+  })
   const { isConnected, address } = useAccount()
   const { connect } = useConnect()
   const { writeContractAsync } = useWriteContract()
@@ -92,16 +96,20 @@ const NFTInfoCards: FC = () => {
         abi: abiCardDistributor,
         functionName: 'craftMasterCard'
       })
-      const txReceipt = useWaitForTransactionReceipt({ hash: tx })
-      if (txReceipt.isSuccess) {
-        alert('success')
-      }
-    } catch (error: any) {
-      if (error.message.includes('User rejected the request')) {
+      setTxHash(tx)
+    } catch (error: unknown) {
+      if (error instanceof Error && error.message.includes('User rejected the request')) {
         alert('The user cancelled the transaction, please try again')
       }
     }
   }
+  useEffect(() => {
+    if (isSuccess) {
+      alert('Transaction succeeded!')
+    } else if (!isLoading && txHash) {
+      alert('Transaction failed!')
+    }
+  }, [isSuccess, isLoading, txHash])
   const data = [
     { label: 'Prize Pool Balance', value: totalPool },
     { label: 'Amount of prize issued', value: totalClaimed },
