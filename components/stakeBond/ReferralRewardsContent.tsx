@@ -1,4 +1,4 @@
-import { FC, ReactNode } from 'react'
+import { FC } from 'react'
 import { useTranslations } from 'next-intl'
 
 type Props = {
@@ -12,7 +12,7 @@ const ReferralRewardsContent: FC<Props> = ({ data }) => {
       {data.map(item => (
         <div key={item.label} className='mt-8'>
           <div className='font-[Poppins] text-[#0CAEE4] text-base sm:text-xl lg:text-2xl mb-2'>{t(item.label)}</div>
-          <div className='font-[Poppins] text-[#FFFFFF] text-base sm:text-xl lg:text-2xl '>10,000 USDT</div>
+          <div className='font-[Poppins] text-[#FFFFFF] text-base sm:text-xl lg:text-2xl '>{item.value}</div>
         </div>
       ))}
     </>

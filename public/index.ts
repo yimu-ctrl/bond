@@ -13,6 +13,7 @@ const IMAGES_MAP = {
   unitedKingdom: '/images/unitedKingdom.svg',
   WhitePaper: '/images/WhitePaper.svg',
   masterNft: '/images/masterNft.svg',
-  Subtract: '/images/Subtract.svg'
+  Subtract: '/images/Subtract.svg',
+  warning: '/images/warning.svg'
 }
 export default IMAGES_MAP

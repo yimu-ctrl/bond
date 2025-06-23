@@ -1,11 +1,50 @@
+'use client'
 import { FC } from 'react'
-import { Props } from '@/types'
+import { ETHType, Props } from '@/types'
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card'
 import { useTranslations } from 'next-intl'
+import { useAccount, useBalance, useReadContract } from 'wagmi'
+import { consts } from '@/types/constants'
+import { formatUnits } from 'viem'
+import { abiTreasuryContract } from '@/types/abi'
 
 const AssetOverview: FC = () => {
   const t = useTranslations('Dashboard')
-  const renderContent = ({ title, value }: Props) => {
+  const { address } = useAccount()
+  const UserBond = useBalance({
+    address: address,
+    token: consts.TESTNET.BOND_TOKEN
+  })
+  const balanceBond = UserBond.data ? Number(formatUnits(UserBond.data.value, consts.TESTNET.BOND_DECIMAL)) : 0
+
+  const useTreasuryBalance = (address: ETHType, decimal: number) => {
+    const result = useReadContract({
+      address: consts.TESTNET.TREASURY_CONTRACT,
+      abi: abiTreasuryContract,
+      functionName: 'getAssetBalance',
+      args: [address]
+    })
+    const balance = result.data ? Number(formatUnits(result.data, decimal)) : 0
+    return balance
+  }
+  const BondTreasury = useTreasuryBalance(consts.TESTNET.BOND_TOKEN, consts.TESTNET.BOND_DECIMAL)
+  const USDTTreasury = useTreasuryBalance(consts.TESTNET.USDT_MOCK, consts.TESTNET.USDT_DECIMAL)
+  const balanceTreasury = BondTreasury * 0.05 + USDTTreasury
+
+  const burnedBalance = useBalance({
+    address: consts.TESTNET.DEAD_ADDRESS,
+    token: consts.TESTNET.BOND_TOKEN
+  })
+
+  const burnedBond =
+    burnedBalance.isSuccess && burnedBalance.data ? Number(formatUnits(burnedBalance.data.value, 18)) : 0
+
+  const amounts = [
+    { title: 'My Balances', value: balanceBond },
+    { title: 'Treasure', value: balanceTreasury },
+    { title: 'Burned', value: burnedBond }
+  ]
+  const renderContent = ({ title, value }: { title: string; value: number }) => {
     return (
       <div
         key={title}
@@ -28,7 +67,7 @@ const AssetOverview: FC = () => {
                 {value.toLocaleString()}BOND
               </div>
               <div className='text-center text-xl sm:text-2xl md:text-xl lg:text-2xl text-[#F9FAFB] '>
-                ≈${Math.floor(value / 100).toLocaleString()} USD
+                {value === 0 ? `N/A` : `≈$${Math.floor(value / 100).toLocaleString()} USD`}
               </div>
             </CardContent>
           )}
@@ -36,12 +75,7 @@ const AssetOverview: FC = () => {
       </div>
     )
   }
-  const data = [
-    { title: 'My Balances', value: 1000000 },
-    { title: 'Treasure', value: 1000000 },
-    { title: 'Burned', value: 1000000 }
-  ]
-  return <div className='flex justify-between flex-wrap w-full gap-4'>{data.map(item => renderContent(item))}</div>
+  return <div className='flex justify-between flex-wrap w-full gap-4'>{amounts.map(item => renderContent(item))}</div>
 }
 AssetOverview.displayName = 'AssetOverview'
 

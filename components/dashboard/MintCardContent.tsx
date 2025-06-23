@@ -6,7 +6,7 @@ import { Props } from '@/types'
 
 const MintCardContent: FC = () => {
   const t = useTranslations('Dashboard')
-  const renderContent = ({ title, value }: Props) => {
+  const renderContent = ({ title, value }: { title: string; value: number }) => {
     return (
       <div key={title} className='w-full text-center flex-grow mt-2 sm:w-1/4'>
         <h2 className='text-[#0CAEE4] font-[Poppins] text-2xl lg:text-4xl'>{t(title)}</h2>

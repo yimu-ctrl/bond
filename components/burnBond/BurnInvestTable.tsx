@@ -1,15 +1,109 @@
+'use client'
 import { FC } from 'react'
 import { Button } from '../ui/button'
 import { useTranslations } from 'next-intl'
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import {
+  injected,
+  useAccount,
+  useConnect,
+  useReadContract,
+  useWaitForTransactionReceipt,
+  useWriteContract
+} from 'wagmi'
+import { consts } from '@/types/constants'
+import { abiBurnContract } from '@/types/abi'
+import { formatUnits } from 'viem'
 
 const BurnInvestTable: FC = () => {
   const t = useTranslations('BurnBond')
+  const { isConnected } = useAccount()
+  const { connect } = useConnect()
+  const { writeContractAsync } = useWriteContract()
+  const handleClickClassic = async () => {
+    if (!isConnected) {
+      connect({ connector: injected() })
+    }
+    try {
+      const tx = await writeContractAsync({
+        address: consts.TESTNET.BURN_CONTRACT,
+        abi: abiBurnContract,
+        functionName: 'normalBurn',
+        args: []
+      })
+      const txReceipt = await useWaitForTransactionReceipt({ hash: tx })
+      if (txReceipt.isSuccess) {
+        alert('Transaction succeeded!')
+      } else {
+        alert('Transaction failed!')
+      }
+    } catch (error: any) {
+      if (error.message.includes('User rejected the request')) {
+        alert('The user cancelled the transaction, please try again')
+      }
+    }
+  }
+  const handleClickTurbo = async () => {
+    if (!isConnected) {
+      connect({ connector: injected() })
+    }
+    try {
+      const tx = await writeContractAsync({
+        address: consts.TESTNET.BURN_CONTRACT,
+        abi: abiBurnContract,
+        functionName: 'turboBurn',
+        args: []
+      })
+      const txReceipt = await useWaitForTransactionReceipt({ hash: tx })
+      if (txReceipt.isSuccess) {
+        alert('Transaction succeeded!')
+      } else {
+        alert('Transaction failed!')
+      }
+    } catch (error: any) {
+      if (error.message.includes('User rejected the request')) {
+        alert('The user cancelled the transaction, please try again')
+      }
+    }
+  }
+  const investmentLimits = useReadContract({
+    address: consts.TESTNET.BURN_CONTRACT,
+    abi: abiBurnContract,
+    functionName: 'getInvestmentLimits',
+    args: []
+  })
+  const ReturnRates = useReadContract({
+    address: consts.TESTNET.BURN_CONTRACT,
+    abi: abiBurnContract,
+    functionName: 'getReturnRates',
+    args: []
+  })
+
   const data = [
     { title: 'Type', value1: 'Classic', value2: 'Turbo' },
-    { title: 'ROI', value1: '110', value2: '120' },
-    { title: 'Limit', value1: '100 USDT', value2: '200 USDT' },
-    { title: 'Remaining', value1: '10,000 USDT', value2: '10,000 USDT' }
+    {
+      title: 'ROI',
+      value1: ReturnRates.data ? `${Number(ReturnRates.data[0]).toLocaleString()}%` : 'Loading',
+      value2: ReturnRates.data ? `${Number(ReturnRates.data[1]).toLocaleString()}%` : 'Loading'
+    },
+    {
+      title: 'Limit',
+      value1: investmentLimits.data
+        ? `${Number(formatUnits(investmentLimits.data[0], consts.TESTNET.USDT_DECIMAL)).toLocaleString()}USDT`
+        : 'Loading',
+      value2: investmentLimits.data
+        ? `${Number(formatUnits(investmentLimits.data[1], consts.TESTNET.USDT_DECIMAL)).toLocaleString()}USDT`
+        : 'Loading'
+    },
+    {
+      title: 'Remaining',
+      value1: investmentLimits.data
+        ? `${Number(formatUnits(investmentLimits.data[4], consts.TESTNET.USDT_DECIMAL)).toLocaleString()}USDT`
+        : 'Loading',
+      value2: investmentLimits.data
+        ? `${Number(formatUnits(investmentLimits.data[4], consts.TESTNET.USDT_DECIMAL)).toLocaleString()}USDT`
+        : 'Loading'
+    }
   ]
   return (
     <Table className='bg-[#17202A] rounded-2xl mt-6 lg:mt-10'>
@@ -36,7 +130,7 @@ const BurnInvestTable: FC = () => {
             </TableCell>
           ))}
           <TableCell className='text-center'>
-            <Button variant='myStyleInvest' size='mySizeInvest'>
+            <Button onClick={handleClickClassic} variant='myStyleInvest' size='mySizeInvest'>
               {t('Invest')}
             </Button>
           </TableCell>
@@ -51,7 +145,7 @@ const BurnInvestTable: FC = () => {
             </TableCell>
           ))}
           <TableCell className='text-center'>
-            <Button variant='myStyleInvest' size='mySizeInvest'>
+            <Button onClick={handleClickTurbo} variant='myStyleInvest' size='mySizeInvest'>
               {t('Invest')}
             </Button>
           </TableCell>
