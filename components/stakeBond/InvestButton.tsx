@@ -1,5 +1,5 @@
 'use client'
-import { FC, useEffect, useState } from 'react'
+import { FC, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
@@ -9,44 +9,42 @@ import { injected, useAccount, useConnect, useWaitForTransactionReceipt, useWrit
 import { consts } from '@/types/constants'
 import { abiStakingContract } from '@/types/abi'
 import { ETHType } from '@/types'
+import { erc20Abi, parseUnits } from 'viem'
 
 const InvestButton: FC<{ type: string }> = ({ type }) => {
   const t = useTranslations('StakeBond')
-  const [txHash, setTxHash] = useState<`0x${string}`>()
-  const { isLoading, isSuccess } = useWaitForTransactionReceipt({
-    hash: txHash
+  const { data: hash, writeContractAsync } = useWriteContract()
+  const { isError, isSuccess } = useWaitForTransactionReceipt({
+    hash
   })
   const { isConnected } = useAccount()
   const { connect } = useConnect()
-  const { writeContractAsync } = useWriteContract()
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
     const amount = Number(formData.get('amount'))
+    const amountInWei = parseUnits(amount.toString(), consts.TESTNET.BOND_DECIMAL)
     const referrer = formData.get('referrer')?.toString() || ''
     if (!isConnected) {
       connect({ connector: injected() })
     }
+    await writeContractAsync({
+      address: consts.TESTNET.BOND_TOKEN,
+      abi: erc20Abi,
+      functionName: 'approve',
+      args: [consts.TESTNET.STAKING_CONTRACT, amountInWei]
+    })
     try {
-      if (/^0x[a-fA-F0-9]{0,40}$/.test(referrer)) {
-        if (type === 'Invest With USDT') {
-          const tx = await writeContractAsync({
-            address: consts.TESTNET.STAKING_CONTRACT,
-            abi: abiStakingContract,
-            functionName: 'stakeUSDT',
-            args: [BigInt(amount), referrer as ETHType]
-          })
-          setTxHash(tx)
-        } else {
-          const tx = await writeContractAsync({
-            address: consts.TESTNET.STAKING_CONTRACT,
-            abi: abiStakingContract,
-            functionName: 'stakeBOND',
-            args: [BigInt(amount), referrer as ETHType]
-          })
-          setTxHash(tx)
-        }
-      }
+      const isValidReferrer = /^0x[a-fA-F0-9]{0,40}$/.test(referrer)
+      const referrerAddress = isValidReferrer ? (referrer as ETHType) : '0x0000000000000000000000000000000000000000'
+      const functionName = type === 'Invest With USDT' ? 'stakeUSDT' : 'stakeBOND'
+      await writeContractAsync({
+        address: consts.TESTNET.STAKING_CONTRACT,
+        abi: abiStakingContract,
+        functionName,
+        args: [amountInWei, referrerAddress]
+      })
     } catch (error: unknown) {
       if (error instanceof Error && error.message.includes('User rejected the request')) {
         alert('The user cancelled the transaction, please try again')
@@ -56,10 +54,10 @@ const InvestButton: FC<{ type: string }> = ({ type }) => {
   useEffect(() => {
     if (isSuccess) {
       alert('Transaction succeeded!')
-    } else if (!isLoading && txHash) {
+    } else if (isError) {
       alert('Transaction failed!')
     }
-  }, [isSuccess, isLoading, txHash])
+  }, [isSuccess, isError])
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -94,8 +92,6 @@ const InvestButton: FC<{ type: string }> = ({ type }) => {
                 id='referrer'
                 name='referrer'
                 placeholder="Enter Referrer's address(optional)"
-                pattern='^0x[a-fA-F0-9]{40}$'
-                title='请输入有效的以太坊地址（0x开头 + 40位十六进制字符）'
               />
             </div>
           </div>

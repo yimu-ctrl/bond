@@ -19,19 +19,18 @@ import { ETHType } from '@/types'
 
 const GenesisNodeButton: FC = () => {
   const [open, setOpen] = useState(false)
-  const [txHash, setTxHash] = useState<`0x${string}`>()
-  const { isLoading, isSuccess } = useWaitForTransactionReceipt({
-    hash: txHash
+  const { data: hash, writeContractAsync } = useWriteContract()
+  const { isError, isSuccess } = useWaitForTransactionReceipt({
+    hash
   })
   const t = useTranslations('Dashboard')
   const { address, isConnected } = useAccount()
   const { connect } = useConnect()
-  const presaleStatus = useReadContract({
+  const { data } = useReadContract({
     address: consts.TESTNET.BOND_PRESALE,
     abi: abiBondPresale,
     functionName: 'paused'
   })
-  const status = presaleStatus.data ? presaleStatus.data : false
 
   const handleClick = () => {
     if (!isConnected) {
@@ -46,9 +45,10 @@ const GenesisNodeButton: FC = () => {
     functionName: 'getReferrer',
     args: address ? [address] : undefined
   })
-  const defaultValue = resultReferrer.data ? resultReferrer.data : ''
 
-  const { writeContractAsync } = useWriteContract()
+  const defaultValue = resultReferrer.data ? resultReferrer.data : ''
+  console.log(defaultValue)
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
@@ -62,25 +62,24 @@ const GenesisNodeButton: FC = () => {
       }
       referrerAddress = referrerInput as ETHType
     }
-    const tx = await writeContractAsync({
+    await writeContractAsync({
       address: consts.TESTNET.BOND_PRESALE,
       abi: abiBondPresale,
       functionName: 'purchaseTokens',
       args: [referrerAddress]
     })
-    setTxHash(tx)
   }
   useEffect(() => {
     if (isSuccess) {
       alert('Transaction succeeded!')
-    } else if (!isLoading && txHash) {
+    } else if (isError) {
       alert('Transaction failed!')
     }
-  }, [isSuccess, isLoading, txHash])
+  }, [isSuccess, isError])
   return (
     <div className='flex justify-center mt-5 sm:mt-10 md:mt-5 lg:mt-10 pb-5 sm:pb-10 md:pb-5 lg:pb-10'>
       <Button
-        disabled={!status}
+        disabled={data}
         onClick={handleClick}
         className='bg-[#0CAEE4] font-[Poppins] sm:text-2xl cursor-pointer hover:bg-[#34A5B3] h-10 sm:h-12 sm:w-50 rounded-3xl px-6'
       >

@@ -1,5 +1,5 @@
 'use client'
-import { FC, useEffect, useState } from 'react'
+import { FC, useEffect } from 'react'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../ui/card'
 import ReferralRewardsContent from '../stakeBond/ReferralRewardsContent'
 import { useTranslations } from 'next-intl'
@@ -20,21 +20,12 @@ import { formatUnits } from 'viem'
 
 const NFTInfoCards: FC = () => {
   const t = useTranslations('NFTRaffle')
-  const [txHash, setTxHash] = useState<`0x${string}`>()
-  const { isLoading, isSuccess } = useWaitForTransactionReceipt({
-    hash: txHash
+  const { data: hash, writeContractAsync } = useWriteContract()
+  const { isError, isSuccess } = useWaitForTransactionReceipt({
+    hash
   })
   const { isConnected, address } = useAccount()
   const { connect } = useConnect()
-  const { writeContractAsync } = useWriteContract()
-
-  // const userClaimDetails = useReadContract({
-  //   address: consts.TESTNET.LOTTERY,
-  //   abi: abiLottery,
-  //   functionName: 'getUserClaimDetails',
-  //   args: address ? [address] : undefined
-  // })
-  // const masterCardIds = userClaimDetails.data ? userClaimDetails.data[3] : []
 
   const lotteryInfo = useReadContract({
     address: consts.TESTNET.LOTTERY,
@@ -61,42 +52,18 @@ const NFTInfoCards: FC = () => {
     ? `${Number(formatUnits(lotteryInfo.data[3], consts.TESTNET.USDT_DECIMAL)).toLocaleString()}USDT`
     : 'isLoading'
 
-  const handleRewards = async () => {
-    if (!isConnected) {
-      connect({ connector: injected() })
-    }
-    // try {
-    //   masterCardIds.forEach(async item => {
-    //     const tx = await writeContractAsync({
-    //       address: consts.TESTNET.LOTTERY,
-    //       abi: abiLottery,
-    //       functionName: 'claimPrize',
-    //       args: [item]
-    //     })
-    //     const txReceipt = useWaitForTransactionReceipt({ hash: tx })
-    //     if (txReceipt.isSuccess) {
-    //       alert('success')
-    //     }
-    //   })
-    // } catch (error: any) {
-    //   if (error.message.includes('User rejected the request')) {
-    //     alert('The user cancelled the transaction, please try again')
-    //   } else {
-    //     alert(`Failed to collect, please check the console log`)
-    //   }
-    // }
-  }
+  const handleRewards = () => {}
+
   const handleCraftMasterCard = async () => {
     if (!isConnected) {
       connect({ connector: injected() })
     }
     try {
-      const tx = await writeContractAsync({
+      await writeContractAsync({
         address: consts.TESTNET.CARD_DISTRIBUTOR,
         abi: abiCardDistributor,
         functionName: 'craftMasterCard'
       })
-      setTxHash(tx)
     } catch (error: unknown) {
       if (error instanceof Error && error.message.includes('User rejected the request')) {
         alert('The user cancelled the transaction, please try again')
@@ -106,10 +73,10 @@ const NFTInfoCards: FC = () => {
   useEffect(() => {
     if (isSuccess) {
       alert('Transaction succeeded!')
-    } else if (!isLoading && txHash) {
+    } else if (isError) {
       alert('Transaction failed!')
     }
-  }, [isSuccess, isLoading, txHash])
+  }, [isSuccess, isError])
   const data = [
     { label: 'Prize Pool Balance', value: totalPool },
     { label: 'Amount of prize issued', value: totalClaimed },

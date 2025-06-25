@@ -1,5 +1,4 @@
-'use client'
-import { FC, useEffect, useState } from 'react'
+import { FC } from 'react'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,62 +14,11 @@ import { Button } from '../ui/button'
 import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import IMAGES_MAP from '@/public'
-import {
-  injected,
-  useAccount,
-  useConnect,
-  useReadContract,
-  useWaitForTransactionReceipt,
-  useWriteContract
-} from 'wagmi'
-import { consts } from '@/types/constants'
-import { abiStakingContract } from '@/types/abi'
+import { useStakeUserWithdraw } from '@/hooks/useStakeUserWithdraw'
 
 const WithdrawCapitalButton: FC = () => {
   const t = useTranslations('StakeBond')
-  const [txHash, setTxHash] = useState<`0x${string}`>()
-  const { isLoading, isSuccess } = useWaitForTransactionReceipt({
-    hash: txHash
-  })
-  const { address, isConnected } = useAccount()
-  const { connect } = useConnect()
-  const { writeContractAsync } = useWriteContract()
-  const userStakeCount = useReadContract({
-    address: consts.TESTNET.STAKING_CONTRACT,
-    abi: abiStakingContract,
-    functionName: 'getUserStakeCount',
-    args: address ? [address] : undefined
-  })
-
-  const handleWithdrawCapital = async () => {
-    if (!isConnected) {
-      connect({ connector: injected() })
-    }
-    try {
-      if (isConnected && address) {
-        for (let i = 0; i <= Number(userStakeCount.data); i++) {
-          const tx = await writeContractAsync({
-            address: consts.TESTNET.STAKING_CONTRACT,
-            abi: abiStakingContract,
-            functionName: 'withdrawStake',
-            args: [BigInt(i)]
-          })
-          setTxHash(tx)
-        }
-      }
-    } catch (error: unknown) {
-      if (error instanceof Error && error.message.includes('User rejected the request')) {
-        alert('The user cancelled the transaction, please try again')
-      }
-    }
-  }
-  useEffect(() => {
-    if (isSuccess) {
-      alert('Transaction succeeded!')
-    } else if (!isLoading && txHash) {
-      alert('Transaction failed!')
-    }
-  }, [isSuccess, isLoading, txHash])
+  const { handleWithdraw } = useStakeUserWithdraw()
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
@@ -99,7 +47,7 @@ const WithdrawCapitalButton: FC = () => {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className='sm:justify-around'>
-          <AlertDialogAction onClick={handleWithdrawCapital} className='bg-[#00000033]'>
+          <AlertDialogAction onClick={() => handleWithdraw('withdrawStake')} className='bg-[#00000033]'>
             Continue
           </AlertDialogAction>
           <AlertDialogCancel className='bg-[#0CAEE4]'>Cancel</AlertDialogCancel>

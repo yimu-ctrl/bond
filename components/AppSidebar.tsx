@@ -20,7 +20,6 @@ import { FC } from 'react'
 const AppSidebar: FC = () => {
   const t = useTranslations('Sidebar')
   const pathname = usePathname()
-
   const locale = useLocale()
 
   const items = [

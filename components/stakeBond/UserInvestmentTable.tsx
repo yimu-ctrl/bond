@@ -1,83 +1,41 @@
 'use client'
-import { FC, useEffect, useState } from 'react'
+import { FC } from 'react'
 import { TableCaption, TableHeader, TableRow, TableHead, TableBody, TableCell, Table, TableFooter } from '../ui/table'
 import { useTranslations } from 'next-intl'
 import { Button } from '../ui/button'
 import WithdrawCapitalButton from './WithdrawCapitalButton'
-import {
-  injected,
-  useAccount,
-  useConnect,
-  useReadContract,
-  useWaitForTransactionReceipt,
-  useWriteContract
-} from 'wagmi'
+import { useAccount, useReadContract } from 'wagmi'
 import { consts } from '@/types/constants'
 import { abiStakingContract } from '@/types/abi'
 import { formatUnits } from 'viem'
+import { useStakeUserWithdraw } from '@/hooks/useStakeUserWithdraw'
 
 const UserInvestmentTable: FC = () => {
   const t = useTranslations('StakeBond')
-  const [txHash, setTxHash] = useState<`0x${string}`>()
-  const { isLoading, isSuccess } = useWaitForTransactionReceipt({
-    hash: txHash
-  })
   const { address, isConnected } = useAccount()
-  const { connect } = useConnect()
-  const { writeContractAsync } = useWriteContract()
-  const userStakeCount = useReadContract({
-    address: consts.TESTNET.STAKING_CONTRACT,
-    abi: abiStakingContract,
-    functionName: 'getUserStakeCount',
-    args: address ? [address] : undefined
-  })
-  const handleClaimRewards = async () => {
-    if (!isConnected) {
-      connect({ connector: injected() })
-    }
-    try {
-      if (isConnected && address) {
-        for (let i = 0; i <= Number(userStakeCount.data); i++) {
-          const tx = await writeContractAsync({
-            address: consts.TESTNET.STAKING_CONTRACT,
-            abi: abiStakingContract,
-            functionName: 'claimReward',
-            args: [BigInt(i)]
-          })
-          setTxHash(tx)
-        }
-      }
-    } catch (error: unknown) {
-      if (error instanceof Error && error.message.includes('User rejected the request')) {
-        alert('The user cancelled the transaction, please try again')
-      }
-    }
-  }
-  useEffect(() => {
-    if (isSuccess) {
-      alert('Transaction succeeded!')
-    } else if (!isLoading && txHash) {
-      alert('Transaction failed!')
-    }
-  }, [isSuccess, isLoading, txHash])
+  const { handleWithdraw } = useStakeUserWithdraw()
   const UserSummary = useReadContract({
     address: consts.TESTNET.STAKING_CONTRACT,
     abi: abiStakingContract,
     functionName: 'getUserSummary',
     args: address ? [address] : undefined
   })
-  const amount = UserSummary.data
-    ? `${(
-        Number(formatUnits(UserSummary.data?.totalInvestedUsdt, consts.TESTNET.USDT_DECIMAL)) +
-        Number(formatUnits(UserSummary.data?.totalInvestedBond, consts.TESTNET.BOND_DECIMAL)) * 0.04
-      ).toLocaleString()}USDT`
-    : 'isLoading'
-  const withdrawableInterest = UserSummary.data
-    ? `${(
-        Number(formatUnits(UserSummary.data?.claimableRewardUsdt, consts.TESTNET.USDT_DECIMAL)) / 0.04 +
-        Number(formatUnits(UserSummary.data?.claimableRewardBond, consts.TESTNET.BOND_DECIMAL))
-      ).toLocaleString()}BOND`
-    : 'isLoading'
+  const amount = isConnected
+    ? UserSummary.data
+      ? `${(
+          Number(formatUnits(UserSummary.data?.totalInvestedUsdt, consts.TESTNET.USDT_DECIMAL)) +
+          Number(formatUnits(UserSummary.data?.totalInvestedBond, consts.TESTNET.BOND_DECIMAL)) * 0.04
+        ).toLocaleString()}USDT`
+      : 'isLoading'
+    : 'N/A'
+  const withdrawableInterest = isConnected
+    ? UserSummary.data
+      ? `${(
+          Number(formatUnits(UserSummary.data?.claimableRewardUsdt, consts.TESTNET.USDT_DECIMAL)) / 0.04 +
+          Number(formatUnits(UserSummary.data?.claimableRewardBond, consts.TESTNET.BOND_DECIMAL))
+        ).toLocaleString()}BOND`
+      : 'isLoading'
+    : 'N/A'
   const data = [
     { title: 'Type', value: '900Days(USDT)' },
     { title: 'Amount', value: amount },
@@ -120,7 +78,7 @@ const UserInvestmentTable: FC = () => {
               <WithdrawCapitalButton />
             </TableCell>
             <TableCell className='text-center px-0' colSpan={2}>
-              <Button onClick={handleClaimRewards} variant='myStyleInvest' size='mySizeInvest'>
+              <Button onClick={() => handleWithdraw('claimReward')} variant='myStyleInvest' size='mySizeInvest'>
                 {t('Claim Interest')}
               </Button>
             </TableCell>

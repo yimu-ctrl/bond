@@ -3,29 +3,21 @@ import { FC } from 'react'
 import { Button } from '../ui/button'
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card'
 import { useTranslations } from 'next-intl'
-import { injected, useAccount, useConnect, useReadContract, useWriteContract } from 'wagmi'
+import { injected, useAccount, useConnect, useWriteContract } from 'wagmi'
 import { consts } from '@/types/constants'
 import { abiBurnContract } from '@/types/abi'
 import { formatUnits } from 'viem'
+import { useBurnContractRead } from '@/hooks/useBurnContractRead'
 
 const UserWithdrawCard: FC = () => {
   const t = useTranslations('BurnBond')
   const { writeContractAsync } = useWriteContract()
   const { address, isConnected } = useAccount()
   const { connect } = useConnect()
-  const userInvestmentStats = useReadContract({
-    address: consts.TESTNET.BURN_CONTRACT,
-    abi: abiBurnContract,
-    functionName: 'getUserInvestmentStats',
-    args: address ? [address] : undefined
-  })
 
-  const userInvestmentCount = useReadContract({
-    address: consts.TESTNET.BURN_CONTRACT,
-    abi: abiBurnContract,
-    functionName: 'getUserInvestmentCount',
-    args: address ? [address] : undefined
-  })
+  const userInvestmentStats = useBurnContractRead('getUserInvestmentStats', address ? [address] : undefined)
+
+  const userInvestmentCount = useBurnContractRead('getUserInvestmentCount', address ? [address] : undefined)
 
   const handleWithdraw = async () => {
     if (!isConnected) {
@@ -59,7 +51,11 @@ const UserWithdrawCard: FC = () => {
         <div className='font-[Poppins] text-[#FFFFFF] text-lg sm:text-xl lg:text-2xl text-center'>
           {address
             ? userInvestmentStats.data
-              ? `${Number(formatUnits(userInvestmentStats.data[4], consts.TESTNET.USDT_DECIMAL)).toLocaleString()}USDT`
+              ? userInvestmentStats.data[4]
+                ? `${Number(
+                    formatUnits(userInvestmentStats.data[4], consts.TESTNET.USDT_DECIMAL)
+                  ).toLocaleString()}USDT`
+                : 'isLoading'
               : 'isLoading'
             : 'N/A'}
         </div>
