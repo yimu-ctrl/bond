@@ -20,11 +20,12 @@ export default function LangSwitch() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant='ghost'>
-          {locale === 'en' ? (
-            <Image width={30} height={30} src={IMAGES_MAP.unitedKingdom} alt='united kingdom' />
-          ) : (
-            <Image width={30} height={30} src={IMAGES_MAP.hongKong} alt='hong kong' />
-          )}
+          <Image
+            width={30}
+            height={30}
+            src={locale === 'en' ? IMAGES_MAP.unitedKingdom : IMAGES_MAP.hongKong}
+            alt={locale === 'en' ? 'English' : '中文'}
+          />
           <p className='text-xl text-[#F9FAFB]'>{t('English')}</p>
           <ChevronDown />
         </Button>

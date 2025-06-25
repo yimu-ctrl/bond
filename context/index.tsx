@@ -4,7 +4,7 @@
 import { wagmiAdapter, projectId } from '@/config'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createAppKit } from '@reown/appkit/react'
-import { mainnet, arbitrum, avalanche, base, optimism, polygon } from '@reown/appkit/networks'
+import { bsc, bscTestnet } from '@reown/appkit/networks'
 import React, { type ReactNode } from 'react'
 import { cookieToInitialState, WagmiProvider, type Config } from 'wagmi'
 
@@ -24,11 +24,12 @@ const metadata = {
 }
 
 // Create the modal
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const modal = createAppKit({
   adapters: [wagmiAdapter],
   projectId,
-  networks: [mainnet, arbitrum, avalanche, base, optimism, polygon],
-  defaultNetwork: mainnet,
+  networks: [bsc, bscTestnet],
+  defaultNetwork: bscTestnet,
   metadata: metadata,
   features: {
     analytics: true // Optional - defaults to your Cloud configuration

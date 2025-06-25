@@ -1,4 +1,6 @@
 export type Props = {
   title: string
-  value: number
+  value: string
 }
+
+export type ETHType = `0x${string}`

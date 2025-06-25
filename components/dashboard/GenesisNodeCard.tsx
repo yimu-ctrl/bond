@@ -36,10 +36,12 @@ const GenesisNodeCard: FC = () => {
                 </DialogTitle>
               </DialogHeader>
               <DialogDescription>
-                <p className='font-[Inter] text-[#F8F5FF] text-center text-xl'>1. Invest up to 200 USDT per wallet; </p>
-                <p className='font-[Inter] text-[#F8F5FF] text-center text-xl'>
+                <span className='font-[Inter] block text-[#F8F5FF] text-center text-xl'>
+                  1. Invest up to 200 USDT per wallet;
+                </span>
+                <span className='font-[Inter] block text-[#F8F5FF] text-center text-xl'>
                   2. You can get 5000 BOND and 2 classic NFTs;
-                </p>
+                </span>
               </DialogDescription>
               <DialogFooter className='sm:justify-center'>
                 <DialogClose asChild>

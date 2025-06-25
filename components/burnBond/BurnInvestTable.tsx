@@ -1,15 +1,48 @@
+'use client'
 import { FC } from 'react'
 import { Button } from '../ui/button'
 import { useTranslations } from 'next-intl'
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { consts } from '@/types/constants'
+import { formatUnits } from 'viem'
+import { useBurnInvest } from '@/hooks/useBurnInvest'
+import { useBurnContractRead } from '@/hooks/useBurnContractRead'
 
 const BurnInvestTable: FC = () => {
   const t = useTranslations('BurnBond')
+  const { handleBurn } = useBurnInvest()
+  const investmentLimits = useBurnContractRead('getInvestmentLimits', [])
+  const ReturnRates = useBurnContractRead('getReturnRates', [])
+
   const data = [
     { title: 'Type', value1: 'Classic', value2: 'Turbo' },
-    { title: 'ROI', value1: '110', value2: '120' },
-    { title: 'Limit', value1: '100 USDT', value2: '200 USDT' },
-    { title: 'Remaining', value1: '10,000 USDT', value2: '10,000 USDT' }
+    {
+      title: 'ROI',
+      value1: ReturnRates.data ? `${Number(ReturnRates.data[0]).toLocaleString()}%` : 'Loading',
+      value2: ReturnRates.data ? `${Number(ReturnRates.data[1]).toLocaleString()}%` : 'Loading'
+    },
+    {
+      title: 'Limit',
+      value1: investmentLimits.data
+        ? `${Number(formatUnits(investmentLimits.data[0], consts.TESTNET.USDT_DECIMAL)).toLocaleString()}USDT`
+        : 'Loading',
+      value2: investmentLimits.data
+        ? `${Number(formatUnits(investmentLimits.data[1], consts.TESTNET.USDT_DECIMAL)).toLocaleString()}USDT`
+        : 'Loading'
+    },
+    {
+      title: 'Remaining',
+      value1: investmentLimits.data
+        ? investmentLimits.data[4]
+          ? `${Number(formatUnits(investmentLimits.data[4], consts.TESTNET.USDT_DECIMAL)).toLocaleString()}USDT`
+          : 'Loading'
+        : 'isLoading',
+      value2: investmentLimits.data
+        ? investmentLimits.data[4]
+          ? `${Number(formatUnits(investmentLimits.data[4], consts.TESTNET.USDT_DECIMAL)).toLocaleString()}USDT`
+          : 'Loading'
+        : 'isLoading'
+    }
   ]
   return (
     <Table className='bg-[#17202A] rounded-2xl mt-6 lg:mt-10'>
@@ -36,7 +69,7 @@ const BurnInvestTable: FC = () => {
             </TableCell>
           ))}
           <TableCell className='text-center'>
-            <Button variant='myStyleInvest' size='mySizeInvest'>
+            <Button onClick={() => handleBurn('normalBurn')} variant='myStyleInvest' size='mySizeInvest'>
               {t('Invest')}
             </Button>
           </TableCell>
@@ -51,7 +84,7 @@ const BurnInvestTable: FC = () => {
             </TableCell>
           ))}
           <TableCell className='text-center'>
-            <Button variant='myStyleInvest' size='mySizeInvest'>
+            <Button onClick={() => handleBurn('turboBurn')} variant='myStyleInvest' size='mySizeInvest'>
               {t('Invest')}
             </Button>
           </TableCell>
