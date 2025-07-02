@@ -1,38 +1,50 @@
+'use client'
 import { FC } from 'react'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { Card } from '../ui/card'
 import IMAGES_MAP from '@/public'
 import { Button } from '../ui/button'
+import { useAccount, useReadContracts } from 'wagmi'
+import { consts } from '@/types/constants'
+import { abiCardNFT } from '@/types/abi'
 
 const UserClassicNft: FC = () => {
   const t = useTranslations('NFTRaffle')
+  const { address } = useAccount()
   const nftTypes = [
-    { tokenId: 1, name: '#1 BOND CAT', image: IMAGES_MAP.bondCat01, balance: 0 },
-    { tokenId: 2, name: '#2 BOND CAT', image: IMAGES_MAP.bondCat01, balance: 0 },
-    { tokenId: 3, name: '#3 BOND CAT', image: IMAGES_MAP.bondCat01, balance: 0 },
-    { tokenId: 4, name: '#4 BOND CAT', image: IMAGES_MAP.bondCat01, balance: 0 },
-    { tokenId: 5, name: '#5 BOND CAT', image: IMAGES_MAP.bondCat01, balance: 0 },
-    { tokenId: 6, name: '#6 BOND CAT', image: IMAGES_MAP.bondCat01, balance: 0 },
-    { tokenId: 7, name: '#7 BOND CAT', image: IMAGES_MAP.bondCat01, balance: 0 },
-    { tokenId: 8, name: '#8 BOND CAT', image: IMAGES_MAP.bondCat01, balance: 0 },
-    { tokenId: 9, name: '#9 BOND CAT', image: IMAGES_MAP.bondCat01, balance: 0 },
-    { tokenId: 10, name: '#10 BOND CAT', image: IMAGES_MAP.bondCat01, balance: 0 }
+    { tokenId: 1, name: '#1 BOND CAT', image: IMAGES_MAP.bondCat01 },
+    { tokenId: 2, name: '#2 BOND CAT', image: IMAGES_MAP.bondCat01 },
+    { tokenId: 3, name: '#3 BOND CAT', image: IMAGES_MAP.bondCat01 },
+    { tokenId: 4, name: '#4 BOND CAT', image: IMAGES_MAP.bondCat01 },
+    { tokenId: 5, name: '#5 BOND CAT', image: IMAGES_MAP.bondCat01 },
+    { tokenId: 6, name: '#6 BOND CAT', image: IMAGES_MAP.bondCat01 },
+    { tokenId: 7, name: '#7 BOND CAT', image: IMAGES_MAP.bondCat01 },
+    { tokenId: 8, name: '#8 BOND CAT', image: IMAGES_MAP.bondCat01 },
+    { tokenId: 9, name: '#9 BOND CAT', image: IMAGES_MAP.bondCat01 },
+    { tokenId: 10, name: '#10 BOND CAT', image: IMAGES_MAP.bondCat01 }
   ]
-  const address = ''
 
-  const renderNFTCard = () => {
-    if (address) {
-      for (let i = 0; i < nftTypes.length; i++) {
-        // TODO:Get the number of NFTs corresponding to the user
+  const { data } = useReadContracts({
+    contracts: address
+      ? nftTypes.map((nft, index) => ({
+          address: consts.TESTNET.CARD_NFT,
+          abi: abiCardNFT,
+          functionName: 'getCardCount',
+          args: [address, BigInt(index)]
+        }))
+      : []
+  })
+  const nfts = nftTypes.map((nft, index) => {
+    const balance = data?.[index]?.status === 'success' ? Number(data[index].result) : 0
+    return { ...nft, balance }
+  })
 
-        const balance = 0
-        nftTypes[i].balance = balance
-      }
-    }
-    return (
+  return (
+    <div>
+      <h2 className='text-center font-[Poppins] text-[#FFFFFF] text-3xl mb-10 '>{t('Your Classic NFT')}</h2>
       <div className='flex justify-around flex-wrap gap-5'>
-        {nftTypes.map(item => (
+        {nfts.map(item => (
           <div key={item.tokenId}>
             <Card className='flex-grow flex justify-center items-center relative bg-[#17202A80] rounded-4xl py-8 px-8 lg:min-w-70'>
               <Image width={104} height={147} src={IMAGES_MAP.bondCat01} alt={'bondCat'} className='lg:h-auto'></Image>
@@ -50,12 +62,6 @@ const UserClassicNft: FC = () => {
           </div>
         ))}
       </div>
-    )
-  }
-  return (
-    <div>
-      <h2 className='text-center font-[Poppins] text-[#FFFFFF] text-3xl mb-10 '>{t('Your Classic NFT')}</h2>
-      {renderNFTCard()}
     </div>
   )
 }

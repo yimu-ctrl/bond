@@ -10,7 +10,7 @@ import { useTranslations } from 'next-intl'
 export default function StakeBond() {
   const t = useTranslations('StakeBond')
   return (
-    <div className='pl-0 pr-0 pt-0 sm:pl-8 sm:pr-8 sm:pt-8'>
+    <div className='pl-2 pr-2 pt-2 sm:pl-8 sm:pr-8 sm:pt-8'>
       <Header title='Stake Bond' desc='Get up to 365% annual returns by staking your USDT or BOND!' />
       <InvestmentOverview />
       <StakeInvestTable />

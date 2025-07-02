@@ -1,5 +1,11 @@
 {
   "cSpell.words": [
     "logob"
+  ],
+  "eslint.workingDirectories": [
+    {
+      "mode": "location",
+      "directory": "."
+    }
   ]
 }
